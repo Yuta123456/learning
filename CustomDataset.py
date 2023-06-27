@@ -10,6 +10,9 @@ from PIL import Image
 class EmbeddingDataset(Dataset):
     def __init__(self, annotations_file):
         self.annotations = pd.read_csv(annotations_file)
+        # 1/4程度にサンプリング
+        self.annotations = self.annotations.sample(len(self.annotations) // 4)
+
         self.positive_pair = self.annotations.copy()
         self.positive_pair['new_column'] = 1
         self.negative_pair = self.annotations.copy()
@@ -39,5 +42,5 @@ class EmbeddingDataset(Dataset):
         # lstmに入れる形にする
         caption = self.data.iloc[idx, 1]
         label = self.data.iloc[idx, 2]
-        return input_image, caption, label
+        return input_image, caption, label, img_path
     
