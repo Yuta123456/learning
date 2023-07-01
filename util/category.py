@@ -21,3 +21,8 @@ def get_coordinate_info(img_path: str):
         print(e)
         return None
     return json_data
+
+def get_item_id(img_path: str):
+    # D:/M1/fashion/IQON/IQON3000\\1283890\\3606832/10755545_m.jpg
+    img_path = img_path.replace('\\', '/')
+    return img_path.split('/')[-1]
