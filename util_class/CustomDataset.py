@@ -11,16 +11,17 @@ class EmbeddingDataset(Dataset):
     def __init__(self, annotations_file):
         self.annotations = pd.read_csv(annotations_file)
         # 1/4程度にサンプリング
-        self.annotations = self.annotations.sample(len(self.annotations) // 4)
+        self.annotations = self.annotations.sample(len(self.annotations) // 16)
 
         self.positive_pair = self.annotations.copy()
         self.positive_pair['new_column'] = 1
-        self.negative_pair = self.annotations.copy()
-        shuffle_caption = np.random.permutation(self.annotations.iloc[:, 1].values)
-        self.negative_pair.iloc[:, 1] = shuffle_caption
-        self.negative_pair['new_column'] = 0
-        self.data = pd.concat([self.positive_pair, self.negative_pair], axis=0)
-        print(self.data.shape)
+        self.data = self.positive_pair.copy()
+        for _ in range(15):
+            negative_pair = self.annotations.copy()
+            shuffle_caption = np.random.permutation(self.annotations.iloc[:, 1].values)
+            negative_pair.iloc[:, 1] = shuffle_caption
+            negative_pair['new_column'] = 0
+            self.data = pd.concat([self.data, negative_pair], axis=0)
         self.transform =  transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
