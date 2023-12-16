@@ -11,17 +11,18 @@ from PIL import Image
 class CompatibilityDataset(Dataset):
     def __init__(self, positive_file, negative_file, n=10000):
         # TODO: ? サンプリング
-        self.postive_annotations = pd.read_csv(positive_file, header=None).sample(
-            n=n, random_state=1
-        )
-        self.negative_annotations = pd.read_csv(negative_file, header=None).sample(
-            n=n * 16, random_state=1
-        )
+        self.positive_annotations = pd.read_csv(
+            positive_file, header=None, encoding="utf-8"
+        ).sample(n=n, random_state=42)
+
+        self.negative_annotations = pd.read_csv(
+            negative_file, header=None, encoding="utf-8"
+        ).sample(n=n * 32, random_state=42)
 
         self.data = pd.concat(
-            [self.postive_annotations, self.negative_annotations], axis=0
+            [self.positive_annotations, self.negative_annotations], axis=0
         )
-        # print(self.data[:5])
+
         self.transform = transforms.Compose(
             [
                 transforms.Resize(256),
@@ -37,6 +38,8 @@ class CompatibilityDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
+        # print(self.data.iloc[idx, 0], self.data.iloc[idx, 2])
+
         image_1 = self.to_image(self.data.iloc[idx, 0])
         image_2 = self.to_image(self.data.iloc[idx, 2])
 
